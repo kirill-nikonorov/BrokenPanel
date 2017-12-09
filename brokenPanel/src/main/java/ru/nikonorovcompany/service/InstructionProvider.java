@@ -7,7 +7,8 @@ public class InstructionProvider {
     private String workableButtons;
     private String requiredCombination;
     private ResettableIntegerIterator iteratorOfDigitsFromRequiredCombination;
-    private Integer theClosestCombinaiton;
+    private Integer theClosestCombination;
+    private Integer countOfIterationsToTheClosestCombination;
 
     public InstructionProvider(String workableButtons, String requiredCombination, ResettableIntegerIterator iteratorOfDigitsFromRequiredCombination) {
         this.workableButtons = workableButtons;
@@ -15,17 +16,25 @@ public class InstructionProvider {
         this.iteratorOfDigitsFromRequiredCombination = iteratorOfDigitsFromRequiredCombination;
     }
 
-    public Integer findTheCountOfIterationsToRequiredNutton() {
-        Integer requiredCombinationNumber = Integer.parseInt(requiredCombination);
-        return Math.abs(theClosestCombinaiton - requiredCombinationNumber);
+    public Integer getTheCountOfIterationsToRequiredCombination() {
+        if (countOfIterationsToTheClosestCombination != null) return countOfIterationsToTheClosestCombination;
+        else
+            countOfIterationsToTheClosestCombination = Math.abs(getTheClosestCombination() - Integer.parseInt(requiredCombination));
+        return countOfIterationsToTheClosestCombination;
     }
 
-    public Integer findCombination() {
+    public Integer getTheClosestCombination() {
+        if (theClosestCombination != null) return theClosestCombination;
+        else return findCombination();
+    }
+
+    private Integer findCombination() {
         if (isAllCombinationIsPossibleToDial()) return Integer.parseInt(requiredCombination);
         Integer numberOfTheClosestCombinationAbove = sumNumbersOfDigitsFromTheClosestCombinationAbove();
+        iteratorOfDigitsFromRequiredCombination.resetIterator();
         Integer numberTheClosestCombinationUnder = sumNumbersOfDigitsFromTheClosestCombinationUnder();
-        theClosestCombinaiton = getTheClosest(numberOfTheClosestCombinationAbove, numberTheClosestCombinationUnder);
-        return theClosestCombinaiton;
+        theClosestCombination = getTheClosestFromTwo(numberOfTheClosestCombinationAbove, numberTheClosestCombinationUnder);
+        return theClosestCombination;
     }
 
 
@@ -37,7 +46,6 @@ public class InstructionProvider {
     }
 
     private Integer sumNumbersOfDigitsFromTheClosestCombinationAbove() {
-        iteratorOfDigitsFromRequiredCombination.resetIterator();
         Integer valueOfDigit = iteratorOfDigitsFromRequiredCombination.next();
         if (workableButtons.contains(String.valueOf(valueOfDigit)))
             return toNumber(valueOfDigit) + sumNumbersOfDigitsFromTheClosestCombinationAbove();
@@ -52,7 +60,6 @@ public class InstructionProvider {
     }
 
     private Integer sumNumbersOfDigitsFromTheClosestCombinationUnder() {
-        iteratorOfDigitsFromRequiredCombination.resetIterator();
         Integer valueOfDigit = iteratorOfDigitsFromRequiredCombination.next();
         if (workableButtons.contains(String.valueOf(valueOfDigit)))
             return toNumber(valueOfDigit) + sumNumbersOfDigitsFromTheClosestCombinationUnder();
@@ -70,7 +77,7 @@ public class InstructionProvider {
         return valueOfDigit * (int) Math.pow(10, iteratorOfDigitsFromRequiredCombination.getDegreeOfDigit());
     }
 
-    private Integer getTheClosest(Integer above, Integer under) {
+    private Integer getTheClosestFromTwo(Integer above, Integer under) {
 
         if (isTheUnderResultValid(under)) return above;
         Integer requiredCombinationNumber = Integer.parseInt(requiredCombination);
