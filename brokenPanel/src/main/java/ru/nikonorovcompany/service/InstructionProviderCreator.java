@@ -1,7 +1,13 @@
 package ru.nikonorovcompany.service;
 
+import ru.nikonorovcompany.iterator.IntegerIterator;
+import ru.nikonorovcompany.iterator.ResettableIntegerIterator;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class InstructionProviderCreator {
     private String[] inputData;
@@ -13,12 +19,14 @@ public class InstructionProviderCreator {
     public InstructionProvider createInstructionProvider() {
         String workableButtons = initializeButtons();
         String requiredCombination = inputData[0];
-        Integer actualDigit = requiredCombination.length();
-        return new InstructionProvider(workableButtons, requiredCombination, actualDigit);
+        ResettableIntegerIterator iterator = new IntegerIterator(extractDigitsValues());
+        return new InstructionProvider(workableButtons, requiredCombination, iterator);
     }
 
-    private Iterator<String> extractIteratorWithRequiredDigitValues() {
-        return Arrays.asList(inputData[0].split("")).iterator();
+    private Integer[] extractDigitsValues() {
+        List<Integer> list = new ArrayList<>();
+        Arrays.stream(inputData[0].split("")).map(Integer::parseInt).forEach(list::add);
+        return  list.toArray(new Integer[0]);
     }
 
     private String initializeButtons() {

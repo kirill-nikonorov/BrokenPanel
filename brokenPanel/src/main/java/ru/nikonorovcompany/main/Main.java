@@ -6,11 +6,11 @@ import ru.nikonorovcompany.service.InstructionProviderCreator;
 public class Main {
     public static void main(String[] args) {
 
-        String[] inputData = "555555 0,1,2,3,4,5,6,7,8".split(" ");
+        String[] inputData = "20 2,0".split(" ");
 
         InstructionProvider provider = new InstructionProviderCreator(inputData).createInstructionProvider();
-        System.out.println(provider.findCombination());
-
-
+        System.out.println("требуемая комбинация = " + inputData[0]);
+        System.out.println("ближайшая комбинация = " + provider.findCombination());
+        System.out.println("количество итераций к ней = " + provider.findTheCountOfIterationsToRequiredNutton());
     }
 }
