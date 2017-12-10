@@ -17,14 +17,6 @@ public class InstructionProviderCreator {
         return new InstructionProvider(workableButtons, requiredCombination);
     }
 
-    private Integer[] extractDigits(Integer number) {
-        List<Integer> list = new ArrayList<>();
-        String numbers = String.valueOf(number);
-        Arrays.stream(numbers.split("")).map(Integer::parseInt).forEach(list::add);
-        return list.toArray(new Integer[0]);
-    }
-
-
     private String initializeButtons() {
         String allButtons = "0123456789";
         return deleteBrokenButtons(allButtons);

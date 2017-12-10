@@ -1,3 +1,5 @@
+package nikonorovcompany.service;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -10,7 +12,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ParameterizeTest {
+public class InstructionProviderTest {
     private String inputString;
     private Integer expected;
 
@@ -21,6 +23,7 @@ public class ParameterizeTest {
                 {"9 9", 8},
                 {"99 9", 100},
                 {"101 0", 99},
+                {"101 0,9", 111},
                 {"111 0,1,2", 99},
                 {"151 1,5", 200},
                 {"1113 1,2", 999},
@@ -33,7 +36,7 @@ public class ParameterizeTest {
         });
     }
 
-    public ParameterizeTest(String inputString, int expected) {
+    public InstructionProviderTest(String inputString, int expected) {
         this.inputString = inputString;
         this.expected = expected;
         ;
