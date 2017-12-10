@@ -10,11 +10,9 @@ public class InstructionProvider {
 
     private String workableButtons;
     private Integer requiredCombination;
-
     private DigitIterator iterator;
     private Integer numberOfTheClosestCombinationResult;
     private Integer countOfIterationsToTheClosestCombination;
-    private Integer value;
 
     public InstructionProvider(String workableButtons, Integer requiredCombination) {
         this.workableButtons = workableButtons;
@@ -36,17 +34,6 @@ public class InstructionProvider {
         }
     }
 
-    private Integer findNumberOfCombinationBeginningInWorkableButtons() {
-        Integer NumberOfCombinationBeginningInWorkableButtons = 0;
-        while (iterator.hasNext()) {
-            if (isWorkable(value)) {
-                NumberOfCombinationBeginningInWorkableButtons += toNumber(value);
-                value = iterator.next();
-            } else break;
-        }
-        return NumberOfCombinationBeginningInWorkableButtons;
-    }
-
     private void findCombination() {
         Integer numberOfTheClosestCombinationAbove = findNumberOfTheClosestCombinationAbove(requiredCombination);
         Integer numberOfTheClosestCombinationUnder = findNumberOfTheClosestCombinationUnder(requiredCombination);
@@ -60,28 +47,41 @@ public class InstructionProvider {
         return new DigitIterator(list);
     }
 
-    private Integer findNumberOfTheClosestCombinationAbove(Integer requiredCombination) {
-        iterator = getIterator(requiredCombination);
-        value = iterator.next();
-
-        Integer numberOfTheClosestCombinationAbove = findNumberOfCombinationBeginningInWorkableButtons();
-        if (!iterator.hasNext() && isLastValueWorkable()) return numberOfTheClosestCombinationAbove;
-
-        else {
-            return fillNumberByRestCombinationAbove(numberOfTheClosestCombinationAbove);
+    private Integer findNumberOfTheClosestCombinationAboveForTheFirstMetBrokenButton() {
+        Integer numberOfTheClosestCombination = 0;
+        Integer value;
+        Integer foundButton;
+        while (iterator.hasNext()) {
+            value = iterator.next();
+            foundButton = findButtonAbove(value);
+            numberOfTheClosestCombination += toNumber(foundButton);
+            if (!value.equals(foundButton)) break;
         }
+        return numberOfTheClosestCombination;
     }
 
-    private Boolean isLastValueWorkable() {
-        return isWorkable(value);
-    }
-
-    private Integer fillNumberByRestCombinationAbove(Integer numberOfTheClosestCombinationAbove) {
-        numberOfTheClosestCombinationAbove += toNumber(findButtonAboveExistingValue(value));
+    private Integer getNumberOfMinimalValuesOfWorkedButtons() {
+        Integer number = 0;
         while (iterator.hasNext()) {
             iterator.next();
-            numberOfTheClosestCombinationAbove += toNumber(addTheMinimalNumbers());
+            number += toNumber(getTheMinimalWorkedButton());
         }
+        return number;
+    }
+
+    private Integer getNumberOfMaximalValuesOfWorkedButtons() {
+        Integer numberOfCombination = 0;
+        while (iterator.hasNext()) {
+            iterator.next();
+            numberOfCombination += toNumber(getTheMaximalWorkedButton());
+        }
+        return numberOfCombination;
+    }
+
+    private Integer findNumberOfTheClosestCombinationAbove(Integer requiredCombination) {
+        iterator = getIterator(requiredCombination);
+        Integer numberOfTheClosestCombinationAbove = findNumberOfTheClosestCombinationAboveForTheFirstMetBrokenButton();
+        numberOfTheClosestCombinationAbove += getNumberOfMinimalValuesOfWorkedButtons();
         return checkAboveCombination(numberOfTheClosestCombinationAbove);
 
     }
@@ -93,24 +93,22 @@ public class InstructionProvider {
 
     private Integer findNumberOfTheClosestCombinationUnder(Integer requiredCombination) {
         iterator = getIterator(requiredCombination);
-        value = iterator.next();
-
-        Integer numberOfTheClosestCombinationUnder = findNumberOfCombinationBeginningInWorkableButtons();
-        if (!iterator.hasNext() && isLastValueWorkable()) return numberOfTheClosestCombinationUnder;
-
-        else {
-            return fillNumberByRestCombinationUnder(numberOfTheClosestCombinationUnder);
-        }
+        Integer numberOfTheClosestCombinationUnder = findNumberOfTheClosestCombinationUnderForTheFirstMetBrokenButton();
+        numberOfTheClosestCombinationUnder += getNumberOfMaximalValuesOfWorkedButtons();
+        return checkUnderCombination(numberOfTheClosestCombinationUnder);
     }
 
-    private Integer fillNumberByRestCombinationUnder(Integer numberOfTheClosestCombinationUnder) {
-        numberOfTheClosestCombinationUnder += toNumber(findNumberOfButtonUnderExistingValue(value));
+    private Integer findNumberOfTheClosestCombinationUnderForTheFirstMetBrokenButton() {
+        Integer numberOfTheClosestCombination = 0;
+        Integer value;
+        Integer foundButton;
         while (iterator.hasNext()) {
-            iterator.next();
-            numberOfTheClosestCombinationUnder += toNumber(addTheMaximalNumbers());
+            value = iterator.next();
+            foundButton = findButtonUnder(value);
+            numberOfTheClosestCombination += toNumber(foundButton);
+            if (!value.equals(foundButton)) break;
         }
-        return checkUnderCombination(numberOfTheClosestCombinationUnder);
-
+        return numberOfTheClosestCombination;
     }
 
     private Integer checkUnderCombination(Integer under) {
@@ -118,7 +116,6 @@ public class InstructionProvider {
         if (isWorkable(under)) return under;
         else return findNumberOfTheClosestCombinationUnder(under);
     }
-
 
     private Boolean isWorkable(Integer combination) {
         String combinationInString = String.valueOf(combination);
@@ -144,7 +141,7 @@ public class InstructionProvider {
         return (theUnderResult > 0 || theUnderResult == 0 && isWorkable(0));
     }
 
-    private Integer findButtonAboveExistingValue(Integer startOfSearch) {
+    private Integer findButtonAbove(Integer startOfSearch) {
         int theClosestButton;
         for (int i = startOfSearch; i <= 9; i++) {
             theClosestButton = i;
@@ -156,10 +153,10 @@ public class InstructionProvider {
     }
 
     private Integer handleOverNine() {
-        return Integer.parseInt(String.valueOf(findButtonAboveExistingValue(1)) + String.valueOf(addTheMinimalNumbers()));
+        return Integer.parseInt(String.valueOf(findButtonAbove(1)) + String.valueOf(getTheMinimalWorkedButton()));
     }
 
-    private Integer findNumberOfButtonUnderExistingValue(Integer startOfSearch) {
+    private Integer findButtonUnder(Integer startOfSearch) {
         int theClosestButton;
         for (int i = startOfSearch; i > 0; i--) {
             theClosestButton = i;
@@ -171,13 +168,13 @@ public class InstructionProvider {
     }
 
     private Integer handleZero() {
-        if (iterator.hasPrevious()) return findNumberOfButtonUnderExistingValue(9) - 10;
+        if (iterator.hasPrevious()) return findButtonUnder(9) - 10;
         else {
             return 0;
         }
     }
 
-    private Integer addTheMaximalNumbers() {
+    private Integer getTheMaximalWorkedButton() {
         int max = 0;
         int buttonValue;
         for (String button : workableButtons.split("")) {
@@ -187,7 +184,7 @@ public class InstructionProvider {
         return max;
     }
 
-    private Integer addTheMinimalNumbers() {
+    private Integer getTheMinimalWorkedButton() {
         int min = 9;
         int buttonValue;
         for (String button : workableButtons.split("")) {
