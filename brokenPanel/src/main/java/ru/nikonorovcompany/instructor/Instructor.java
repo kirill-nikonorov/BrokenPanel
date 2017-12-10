@@ -13,7 +13,7 @@ public class Instructor {
         InstructionProvider provider = new InstructionProviderCreator(args).createInstructionProvider();
 
         System.out.println("требуемая комбинация = " + args[0]);
-        System.out.println("ближайшая комбинация = " + provider.getTheClosestCombination());
+        System.out.println("ближайшая комбинация = " + provider.getNumberOfTheClosestCombinationResult());
         System.out.println("количество итераций к ней = " + provider.getTheCountOfIterationsToRequiredCombination());
     }
 }
